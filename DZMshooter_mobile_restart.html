@@ -168,6 +168,7 @@ function drawGameOver() {
   const duration = Math.floor((endTime - startTime) / 1000);
   ctx.fillStyle = "#fff";
   ctx.font = "16px Arial";
+  ctx.fillText("¡Victoria alcanzada!", canvas.width / 2 - 100, canvas.height / 2 + 40);
   ctx.fillText("Tu tiempo: " + Math.floor(duration / 60) + ":" + ('0' + (duration % 60)).slice(-2), canvas.width / 2 - 80, canvas.height / 2 + 60);
 
   const endTime = Date.now();
@@ -181,6 +182,7 @@ function drawGameOver() {
   localStorage.setItem("topRecords", JSON.stringify(records));
   ctx.fillStyle = "#fff";
   ctx.font = "16px Arial";
+  ctx.fillText("¡Victoria alcanzada!", canvas.width / 2 - 100, canvas.height / 2 + 40);
   ctx.fillText("Tu tiempo: " + Math.floor(duration / 60) + ":" + ('0' + (duration % 60)).slice(-2), canvas.width / 2 - 80, canvas.height / 2 + 60);
   
   
