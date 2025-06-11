@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>DZM Shooter 2D</title>
+  <style>
+    body { margin: 0; background: #000; }
+    canvas { display: block; margin: 0 auto; border: 3px solid #fff; }
+  </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+let player = { x: 375, y: 550, width: 50, height: 20, speed: 5 };
+let bullets = [];
+let enemies = [];
+let bonuses = [];
+let enemyCount = 0;
+let bonusCollected = 0;
+let gameOver = false;
+let gameWon = false;
+let keys = {};
+const bonusWords = ["ADS", "ITO", "Cobertura", "Efectividad", "volumen", "Créditos", "Combos", "Promo mes", "PDV Grandes", "PDV Medianos", "PDV Básicos", "Firmas Autorizadas", "Medidas seguridad", "Marcas estratégicas", "Cobranza al 100"];
+
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+function drawPlayer() {
+  ctx.fillStyle = "#00f";
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+}
+
+function drawBullets() {
+  ctx.fillStyle = "#fff";
+  bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+}
+
+function drawEnemies() {
+  ctx.fillStyle = "red";
+  enemies.forEach(e => {
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawBonuses() {
+  ctx.fillStyle = "yellow";
+  ctx.font = "12px Arial";
+  bonuses.forEach(b => {
+    ctx.fillRect(b.x, b.y, b.size, b.size);
+    ctx.fillStyle = "black";
+    ctx.fillText(b.word, b.x + 2, b.y + b.size / 2);
+    ctx.fillStyle = "yellow";
+  });
+}
+
+function spawnEnemy() {
+  if (enemyCount < 100) {
+    enemies.push({ x: Math.random() * 760 + 20, y: 0, radius: 15, speed: 2 });
+    enemyCount++;
+  }
+}
+
+function spawnBonus() {
+  if (bonusCollected + bonuses.length < bonusWords.length) {
+    const word = bonusWords[bonuses.length];
+    bonuses.push({
+      x: Math.random() * 760,
+      y: 0,
+      size: 70,
+      speed: 1.5,
+      word
+    });
+  }
+}
+
+function move() {
+  if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
+  if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
+  if (keys[" "] && bullets.length < 5) {
+    bullets.push({ x: player.x + player.width / 2 - 2, y: player.y, width: 4, height: 10, speed: 7 });
+  }
+}
+
+function update() {
+  if (gameOver || gameWon) return;
+
+  move();
+  bullets.forEach(b => b.y -= b.speed);
+  enemies.forEach(e => e.y += e.speed);
+  bonuses.forEach(b => b.y += b.speed);
+
+  bullets = bullets.filter(b => b.y > 0);
+  enemies = enemies.filter(e => e.y < canvas.height);
+  bonuses = bonuses.filter(b => b.y < canvas.height);
+
+  bullets.forEach((b, bi) => {
+    enemies.forEach((e, ei) => {
+      const dx = b.x - e.x;
+      const dy = b.y - e.y;
+      if (Math.sqrt(dx*dx + dy*dy) < e.radius) {
+        enemies.splice(ei, 1);
+        bullets.splice(bi, 1);
+      }
+    });
+  });
+
+  enemies.forEach(e => {
+    if (
+      e.x > player.x &&
+      e.x < player.x + player.width &&
+      e.y + e.radius > player.y
+    ) {
+      gameOver = true;
+    }
+  });
+
+  bonuses.forEach((b, i) => {
+    if (
+      b.x < player.x + player.width &&
+      b.x + b.size > player.x &&
+      b.y + b.size > player.y &&
+      b.y < player.y + player.height
+    ) {
+      bonuses.splice(i, 1);
+      bonusCollected++;
+    }
+  });
+
+  if (enemyCount >= 100 && enemies.length === 0) {
+    gameWon = true;
+    updateHighScore((enemyCount - enemies.length));
+  }
+}
+
+function drawUI() {
+  ctx.fillStyle = "#fff";
+  ctx.font = "16px Arial";
+  ctx.fillText("Enemigos eliminados: " + (enemyCount - enemies.length) + " / 100", 10, 20);
+  ctx.fillText("Bonus recogidos: " + bonusCollected + " / 15", 10, 40);
+}
+
+function drawGameOver() {
+  ctx.fillStyle = "rgba(0,0,0,0.7)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#f00";
+  ctx.font = "48px Arial";
+  ctx.fillText("¡Game Over!", 270, 300);
+}
+
+function drawVictory() {
+  ctx.fillStyle = "rgba(0,0,0,0.7)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = "48px Arial";
+  ctx.fillText("¡Victoria!", 300, 300);
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  update();
+  drawPlayer();
+  drawBullets();
+  drawEnemies();
+  drawBonuses();
+  drawUI();
+  if (gameOver) drawGameOver();
+  if (gameWon) drawVictory();
+  requestAnimationFrame(gameLoop);
+}
+
+setInterval(spawnEnemy, 800);
+setInterval(spawnBonus, 3000);
+gameLoop();
+
+<script>
+let highScore = localStorage.getItem("highScorePC") || 0;
+function updateHighScore(score) {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("highScorePC", score);
+  }
+}
+</script>
+</script>
+</body>
+</html>
