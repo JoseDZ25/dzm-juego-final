@@ -161,7 +161,28 @@ function drawGameOver() {
   ctx.font = "16px Arial";
   ctx.fillStyle = "#fff";
   ctx.fillText("Creado por Bucio", canvas.width / 2 - 80, canvas.height / 2 + 40);
+  
   document.getElementById("restartBtn").style.display = "block";
+  const endTime = Date.now();
+  const duration = Math.floor((endTime - startTime) / 1000);
+  const date = new Date().toLocaleString();
+  const record = { bonus: bonusCollected, time: duration, date };
+  let records = JSON.parse(localStorage.getItem("topRecords") || "[]");
+  records.push(record);
+  records.sort((a, b) => b.bonus - a.bonus || a.time - b.time);
+  records = records.slice(0, 50);
+  localStorage.setItem("topRecords", JSON.stringify(records));
+  ctx.fillStyle = "#fff";
+  ctx.font = "16px Arial";
+  ctx.fillText("Tu tiempo: " + Math.floor(duration / 60) + ":" + ('0' + (duration % 60)).slice(-2), canvas.width / 2 - 80, canvas.height / 2 + 60);
+  ctx.fillText("🏆 Mejores 50 partidas:", canvas.width / 2 - 100, canvas.height / 2 + 90);
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
+    const t = Math.floor(r.time / 60) + ":" + ('0' + (r.time % 60)).slice(-2);
+    ctx.fillText(`${i + 1}. ${r.bonus} bonus - ${t} - ${r.date}`, 40, canvas.height / 2 + 110 + i * 20);
+    if (canvas.height / 2 + 110 + i * 20 > canvas.height - 20) break;
+  }
+
 }
 
 function drawVictory() {
@@ -173,7 +194,28 @@ function drawVictory() {
   ctx.font = "16px Arial";
   ctx.fillStyle = "#fff";
   ctx.fillText("Creado por Bucio", canvas.width / 2 - 80, canvas.height / 2 + 40);
+  
   document.getElementById("restartBtn").style.display = "block";
+  const endTime = Date.now();
+  const duration = Math.floor((endTime - startTime) / 1000);
+  const date = new Date().toLocaleString();
+  const record = { bonus: bonusCollected, time: duration, date };
+  let records = JSON.parse(localStorage.getItem("topRecords") || "[]");
+  records.push(record);
+  records.sort((a, b) => b.bonus - a.bonus || a.time - b.time);
+  records = records.slice(0, 50);
+  localStorage.setItem("topRecords", JSON.stringify(records));
+  ctx.fillStyle = "#fff";
+  ctx.font = "16px Arial";
+  ctx.fillText("Tu tiempo: " + Math.floor(duration / 60) + ":" + ('0' + (duration % 60)).slice(-2), canvas.width / 2 - 80, canvas.height / 2 + 60);
+  ctx.fillText("🏆 Mejores 50 partidas:", canvas.width / 2 - 100, canvas.height / 2 + 90);
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
+    const t = Math.floor(r.time / 60) + ":" + ('0' + (r.time % 60)).slice(-2);
+    ctx.fillText(`${i + 1}. ${r.bonus} bonus - ${t} - ${r.date}`, 40, canvas.height / 2 + 110 + i * 20);
+    if (canvas.height / 2 + 110 + i * 20 > canvas.height - 20) break;
+  }
+
 }
 
 function spawnEnemy() {
@@ -267,6 +309,7 @@ function gameLoop() {
 
 setInterval(spawnEnemy, 800);
 setInterval(spawnBonus, 3000);
+const startTime = Date.now();
 gameLoop();
 </script>
 </body>
