@@ -197,7 +197,8 @@ function drawGameOver() {
     records = records.slice(0, 50);
     localStorage.setItem("topRecords", JSON.stringify(records));
     container.remove();
-    showRecords(records, duration);
+    mostrarRecords = true;
+recordsParaMostrar = records;
   };
 
   function showRecords(records, duration) {
@@ -304,7 +305,8 @@ function drawVictory() {
     records = records.slice(0, 50);
     localStorage.setItem("topRecords", JSON.stringify(records));
     container.remove();
-    showRecords(records, duration);
+    mostrarRecords = true;
+recordsParaMostrar = records;
   };
 
   function showRecords(records, duration) {
@@ -440,6 +442,27 @@ function gameLoop() {
 setInterval(spawnEnemy, 800);
 setInterval(spawnBonus, 3000);
 const startTime = Date.now();
+
+let mostrarRecords = false;
+let recordsParaMostrar = [];
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!gameOver && !gameWon) {
+    update();
+    drawPlayer();
+    drawBullets();
+    drawEnemies();
+    drawBonuses();
+    drawUI();
+  } else if (gameOver) {
+    drawGameOver();
+  } else if (mostrarRecords) {
+    drawVictoryDisplay(recordsParaMostrar);
+  }
+  requestAnimationFrame(gameLoop);
+}
+
 gameLoop();
 </script>
 </body>
