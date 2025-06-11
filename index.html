@@ -43,18 +43,5 @@
   <button class="menu-button" onclick="location.href='DZMshooter.html'">🖥️ Modo Shooter Clásico (PC)</button>
   <button class="menu-button" onclick="location.href='DZMshooter_mobile_restart.html'">📱 Modo Shooter Móvil</button>
   <p style="margin-top: 40px; font-size: 16px; color: #ccc;">Creado por Bucio ✨</p>
-  <script>
-    const highScorePC = localStorage.getItem("highScorePC") || 0;
-    const highScoreMobile = localStorage.getItem("highScoreMobile") || 0;
-    const scoreDiv = document.createElement('div');
-    scoreDiv.style.marginTop = '20px';
-    scoreDiv.style.fontSize = '14px';
-    scoreDiv.style.color = '#aaa';
-    scoreDiv.innerHTML = `
-      🏆 Puntaje más alto (PC): ${highScorePC}<br>
-      🏆 Puntaje más alto (Móvil): ${highScoreMobile}
-    `;
-    document.body.appendChild(scoreDiv);
-  </script>
 </body>
 </html>
